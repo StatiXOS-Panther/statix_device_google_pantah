@@ -29,7 +29,7 @@ DEVICE_PACKAGE_OVERLAYS += device/google/pantah/panther/overlay
 include device/google/pantah/audio/panther/audio-tables.mk
 include device/google/gs201/device-shipping-common.mk
 include hardware/google/pixel/vibrator/cs40l26/device.mk
-include device/google/gs101/bluetooth/bluetooth.mk
+include device/google/gs-common/bcmbt/bluetooth.mk
 
 DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/pantah/device_framework_matrix_product.xml
 # go/lyric-soong-variables
@@ -214,11 +214,11 @@ PRODUCT_SOONG_NAMESPACES += \
 
 # Fingerprint HAL
 GOODIX_CONFIG_BUILD_VERSION := g7_trusty
-include device/google/gs101/fingerprint/udfps_common.mk
+$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_common.mk)
 ifeq ($(filter factory%, $(TARGET_PRODUCT)),)
-include device/google/gs101/fingerprint/udfps_shipping.mk
+$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_shipping.mk)
 else
-include device/google/gs101/fingerprint/udfps_factory.mk
+$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_factory.mk)
 endif
 
 # Display
