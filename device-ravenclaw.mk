@@ -14,19 +14,6 @@
 # limitations under the License.
 #
 
-# Restrict the visibility of Android.bp files to improve build analysis time
-$(call inherit-product-if-exists, vendor/google/products/sources_pixel.mk)
-
-RELEASE_GOOGLE_BOOTLOADER_CHEETAH_DIR ?= pdk# Keep this for pdk TODO: b/327119000
-RELEASE_GOOGLE_PRODUCT_BOOTLOADER_DIR := bootloader/$(RELEASE_GOOGLE_BOOTLOADER_CHEETAH_DIR)
-$(call soong_config_set,pantah_bootloader,prebuilt_dir,$(RELEASE_GOOGLE_BOOTLOADER_CHEETAH_DIR))
-ifneq ($(filter trunk%, $(RELEASE_GOOGLE_BOOTLOADER_CHEETAH_DIR)),)
-$(call soong_config_set,pantah_fingerprint,prebuilt_dir,trunk)
-else
-$(call soong_config_set,pantah_fingerprint,prebuilt_dir,$(RELEASE_GOOGLE_BOOTLOADER_CHEETAH_DIR))
-endif
-
-
 TARGET_KERNEL_DIR ?= device/google/pantah-kernel
 TARGET_BOARD_KERNEL_HEADERS := device/google/pantah-kernel/kernel-headers
 
@@ -38,9 +25,9 @@ $(call inherit-product-if-exists, vendor/google_devices/pantah/proprietary/raven
 include device/google/gs201/device-shipping-common.mk
 include device/google/pantah/audio/ravenclaw/audio-tables.mk
 include hardware/google/pixel/vibrator/cs40l26/device.mk
-include device/google/gs-common/bcmbt/bluetooth.mk
-include device/google/gs-common/touch/lsi/lsi.mk
+include device/google/gs101/bluetooth/bluetooth.mk
 
+DEVICE_PRODUCT_COMPATIBILITY_MATRIX_FILE += device/google/pantah/device_framework_matrix_product.xml
 ifeq ($(filter factory_ravenclaw, $(TARGET_PRODUCT)),)
 include device/google/gs101/uwb/uwb.mk
 include device/google/pantah/uwb/uwb_calibration.mk
@@ -79,7 +66,7 @@ PRODUCT_COPY_FILES += \
     device/google/pantah/nfc/libnfc-nci.conf:$(TARGET_COPY_OUT_PRODUCT)/etc/libnfc-nci.conf
 
 PRODUCT_PACKAGES += \
-	$(RELEASE_PACKAGE_NFC_STACK) \
+	NfcNci \
 	Tag \
 	android.hardware.nfc-service.st
 
@@ -107,17 +94,19 @@ PRODUCT_COPY_FILES += \
 	device/google/pantah/powerhint-ravenclaw.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
 
 # Bluetooth HAL
+DEVICE_MANIFEST_FILE += \
+	device/google/pantah/bluetooth/manifest_bluetooth.xml
+PRODUCT_SOONG_NAMESPACES += \
+        vendor/broadcom/bluetooth
+PRODUCT_PACKAGES += \
+	android.hardware.bluetooth@1.1-service.bcmbtlinux \
+	bt_vendor.conf
 PRODUCT_COPY_FILES += \
 	device/google/pantah/bluetooth/bt_vendor_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth/bt_vendor_overlay.conf
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.bluetooth.a2dp_offload.supported=true \
     persist.bluetooth.a2dp_offload.disabled=false \
     persist.bluetooth.a2dp_offload.cap=sbc-aac-aptx-aptxhd-ldac-opus
-PRODUCT_PRODUCT_PROPERTIES += \
-    persist.bluetooth.firmware.selection=BCM.hcd
-# default BDADDR for EVB only
-PRODUCT_PROPERTY_OVERRIDES += \
-	ro.vendor.bluetooth.evb_bdaddr="22:22:22:33:44:55"
 
 # Keymaster HAL
 #LOCAL_KEYMASTER_PRODUCT_PACKAGE ?= android.hardware.keymaster@4.1-service
@@ -149,17 +138,21 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # 	ro.hardware.keystore=software \
 # 	ro.hardware.gatekeeper=software
 
+# default BDADDR for EVB only
+PRODUCT_PROPERTY_OVERRIDES += \
+	ro.vendor.bluetooth.evb_bdaddr="22:22:22:33:44:55"
+
 # PowerStats HAL
 PRODUCT_SOONG_NAMESPACES += \
     device/google/pantah/powerstats/ravenclaw
 
 # Fingerprint HAL
 GOODIX_CONFIG_BUILD_VERSION := g6_trusty
-$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_common.mk)
+include device/google/gs101/fingerprint/udfps_common.mk
 ifeq ($(filter factory%, $(TARGET_PRODUCT)),)
-$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_shipping.mk)
+include device/google/gs101/fingerprint/udfps_shipping.mk
 else
-$(call inherit-product-if-exists, vendor/goodix/udfps/configuration/udfps_factory.mk)
+include device/google/gs101/fingerprint/udfps_factory.mk
 endif
 
 # WiFi Overlay
@@ -188,6 +181,9 @@ endif
 # Set zram size
 PRODUCT_VENDOR_PROPERTIES += \
 	vendor.zram.size=3g
+
+PRODUCT_PRODUCT_PROPERTIES += \
+    persist.bluetooth.firmware.selection=BCM.hcd
 
 # Device features
 PRODUCT_COPY_FILES += \

@@ -17,6 +17,7 @@ PRODUCT_SOONG_NAMESPACES += \
 
 # AOSP packages required by the blobs
 PRODUCT_PACKAGES := \
+    QualifiedNetworksService \
     ShannonIms \
     ShannonRcs \
 

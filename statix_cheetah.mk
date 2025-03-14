@@ -13,7 +13,7 @@ $(call inherit-product, device/google/pantah/aosp_cheetah.mk)
 $(call inherit-product-if-exists, vendor/google/pixelparts/pixelparts.mk)
 $(call inherit-product-if-exists, vendor/google/pixelparts/powershare/device.mk)
 
-# Device identifier. This must come after all inclusions
+## Device identifier. This must come after all inclusions
 PRODUCT_NAME := statix_cheetah
 PRODUCT_MODEL := Pixel 7 Pro
 PRODUCT_BRAND := google
@@ -21,6 +21,6 @@ PRODUCT_MANUFACTURER := Google
 
 PRODUCT_BUILD_PROP_OVERRIDES += \
     PRODUCT_NAME=cheetah \
-    PRIVATE_BUILD_DESC="cheetah-user 15 AP4A.250205.002 12821496 release-keys"
+    PRIVATE_BUILD_DESC="cheetah-user 13 TQ2A.230505.002 9891397 release-keys"
 
 BUILD_FINGERPRINT := $(PRODUCT_OVERRIDE_FINGEPRINT)

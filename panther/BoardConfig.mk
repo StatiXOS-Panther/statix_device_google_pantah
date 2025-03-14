@@ -46,5 +46,6 @@ ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
 endif
 endif
 
+
 DEVICE_PATH := device/google/pantah
-VENDOR_PATH := vendor/google/panther
+VENDOR_PATH := vendor/google_devices/panther
